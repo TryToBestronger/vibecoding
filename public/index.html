@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI热点监控平台 - 走在吃瓜第一线</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">
+          <span class="logo-icon">🔥</span>
+          <span class="logo-text">AI热点监控</span>
+        </h1>
+        <div class="header-actions">
+          <button class="btn-notification" id="notificationBtn">
+            <span class="notification-icon">🔔</span>
+            <span class="notification-badge" id="notificationBadge">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="keywords-section">
+        <div class="section-header">
+          <h2>关键词监控</h2>
+          <button class="btn-primary" id="addKeywordBtn">+ 添加关键词</button>
+        </div>
+        
+        <div class="keywords-grid" id="keywordsGrid">
+        </div>
+      </section>
+
+      <section class="hotspots-section">
+        <div class="section-header">
+          <h2>热点发现</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-secondary" id="clearHotspotsBtn">🗑️ 清空热点</button>
+            <button class="btn-secondary" id="discoverBtn">🔍 发现热点</button>
+          </div>
+        </div>
+        
+        <div class="hotspots-list" id="hotspotsList">
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="addKeywordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>添加监控关键词</h3>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="keywordInput">关键词</label>
+          <input type="text" id="keywordInput" placeholder="例如: GPT-5, Claude 4" class="input-field">
+        </div>
+        <div class="form-group">
+          <label for="categoryInput">分类</label>
+          <input type="text" id="categoryInput" placeholder="例如: AI编程" value="AI编程" class="input-field">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelBtn">取消</button>
+        <button class="btn-primary" id="confirmAddBtn">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>通知中心</h3>
+      <button class="panel-close" id="closePanelBtn">&times;</button>
+    </div>
+    <div class="notification-list" id="notificationList">
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
