@@ -71,4 +71,37 @@ router.post('/:id/check', async (req, res) => {
   }
 });
 
+// 白名单管理接口
+router.get('/whitelist', (req, res) => {
+  try {
+    const whitelist = dataService.getWhitelist();
+    res.json({ success: true, data: whitelist });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/whitelist', (req, res) => {
+  try {
+    const { account } = req.body;
+    if (!account) {
+      return res.status(400).json({ success: false, error: '账号不能为空' });
+    }
+    const whitelist = dataService.addWhitelistAccount(account.trim());
+    res.json({ success: true, data: whitelist });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/whitelist/:account', (req, res) => {
+  try {
+    const { account } = req.params;
+    const whitelist = dataService.removeWhitelistAccount(decodeURIComponent(account));
+    res.json({ success: true, data: whitelist });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

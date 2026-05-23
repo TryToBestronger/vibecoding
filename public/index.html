@@ -3,85 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI热点监控平台 - 走在吃瓜第一线</title>
+  <title>AI热点监控 - 发现 · 追踪 · 分享</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
+
+  <div class="background-effects">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="grid-pattern"></div>
+
+  <div class="svg-lines">
+    <svg viewBox="0 0 1200 800" preserveAspectRatio="none">
+      <path d="M-100,200 Q200,100 500,250 T1100,200" vector-effect="non-scaling-stroke"/>
+      <path d="M-100,400 Q300,500 600,350 T1100,450" vector-effect="non-scaling-stroke"/>
+      <path d="M-100,600 Q250,500 550,650 T1100,550" vector-effect="non-scaling-stroke"/>
+    </svg>
+  </div>
+
   <div class="container">
+
     <header class="header">
       <div class="header-content">
-        <h1 class="logo">
-          <span class="logo-icon">🔥</span>
-          <span class="logo-text">AI热点监控</span>
-        </h1>
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              <circle cx="12" cy="12" r="9" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="logo-text-wrap">
+            <span class="logo-title">AI热点监控</span>
+            <span class="logo-subtitle">Real-time Intelligence</span>
+          </div>
+        </div>
+
         <div class="header-actions">
-          <button class="btn-notification" id="notificationBtn">
-            <span class="notification-icon">🔔</span>
-            <span class="notification-badge" id="notificationBadge">0</span>
+          <button class="btn btn-secondary btn-sm" id="whitelistBtn" title="白名单管理">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            白名单
+          </button>
+          <button class="btn-notification" id="notificationBtn" aria-label="通知中心">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notification-badge" id="notificationBadge" style="display:none">0</span>
           </button>
         </div>
       </div>
     </header>
 
     <main class="main-content">
-      <section class="keywords-section">
+
+      <section class="section keywords-section">
         <div class="section-header">
-          <h2>关键词监控</h2>
-          <button class="btn-primary" id="addKeywordBtn">+ 添加关键词</button>
+          <h2>
+            <span class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </span>
+            关键词监控
+          </h2>
+          <button class="btn btn-primary" id="addKeywordBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            添加关键词
+          </button>
         </div>
-        
-        <div class="keywords-grid" id="keywordsGrid">
-        </div>
+        <div class="keywords-grid" id="keywordsGrid"></div>
       </section>
 
-      <section class="hotspots-section">
+      <section class="section hotspots-section">
         <div class="section-header">
-          <h2>热点发现</h2>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn-secondary" id="clearHotspotsBtn">🗑️ 清空热点</button>
-            <button class="btn-secondary" id="discoverBtn">🔍 发现热点</button>
+          <h2>
+            <span class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+              </svg>
+            </span>
+            热点发现
+          </h2>
+          <div class="btn-group">
+            <button class="btn btn-secondary" id="clearHotspotsBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14"/>
+              </svg>
+              清空
+            </button>
+            <button class="btn btn-primary" id="discoverBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                <path d="M21 3v5h-5"/>
+              </svg>
+              发现热点
+            </button>
           </div>
         </div>
         
-        <div class="hotspots-list" id="hotspotsList">
+        <!-- 信息源筛选 -->
+        <div class="source-filter" id="sourceFilter">
+          <span class="filter-label">来源筛选:</span>
+          <button class="filter-chip active" data-source="all">全部</button>
+          <button class="filter-chip" data-source="微博">微博</button>
+          <button class="filter-chip" data-source="微博热搜">微博热搜</button>
+          <button class="filter-chip" data-source="知乎">知乎</button>
+          <button class="filter-chip" data-source="知乎热榜">知乎热榜</button>
+          <button class="filter-chip" data-source="B站">B站</button>
+          <button class="filter-chip" data-source="B站热门">B站热门</button>
+          <button class="filter-chip" data-source="Twitter/X">Twitter/X</button>
         </div>
+        
+        <div class="hotspots-list" id="hotspotsList"></div>
       </section>
+
     </main>
   </div>
 
-  <div class="modal" id="addKeywordModal">
-    <div class="modal-content">
+  <!-- 添加关键词模态框 -->
+  <div class="modal-overlay" id="addKeywordModal">
+    <div class="modal">
       <div class="modal-header">
         <h3>添加监控关键词</h3>
-        <button class="modal-close" id="closeModalBtn">&times;</button>
+        <button class="modal-close" id="closeModalBtn" aria-label="关闭">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label for="keywordInput">关键词</label>
-          <input type="text" id="keywordInput" placeholder="例如: GPT-5, Claude 4" class="input-field">
+          <input type="text" id="keywordInput" placeholder="关键词: GPT-5 / 微博: @OpenAI / 知乎: 用户名 / B站: UID" class="input-field" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="categoryInput">分类</label>
-          <input type="text" id="categoryInput" placeholder="例如: AI编程" value="AI编程" class="input-field">
+          <input type="text" id="categoryInput" placeholder="例如: 大语言模型" value="AI编程" class="input-field" autocomplete="off">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" id="cancelBtn">取消</button>
-        <button class="btn-primary" id="confirmAddBtn">确认添加</button>
+        <button class="btn btn-secondary" id="cancelBtn">取消</button>
+        <button class="btn btn-primary" id="confirmAddBtn">确认添加</button>
       </div>
     </div>
   </div>
 
-  <div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-      <h3>通知中心</h3>
-      <button class="panel-close" id="closePanelBtn">&times;</button>
-    </div>
-    <div class="notification-list" id="notificationList">
+  <!-- 白名单管理模态框 -->
+  <div class="modal-overlay" id="whitelistModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>信息源白名单管理</h3>
+        <button class="modal-close" id="closeWhitelistBtn" aria-label="关闭">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="whitelist-info">
+          <p>白名单中的账号内容会被优先展示，且过滤阈值适当放宽。支持微博、知乎、B站等平台账号。</p>
+        </div>
+        <div class="form-group">
+          <label>添加账号</label>
+          <div class="input-group">
+            <input type="text" id="whitelistInput" placeholder="例如: OpenAI" class="input-field" autocomplete="off">
+            <button class="btn btn-primary" id="addWhitelistBtn">添加</button>
+          </div>
+        </div>
+        <div class="whitelist-list" id="whitelistList"></div>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- 通知面板 -->
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>通知中心</h3>
+      <button class="modal-close" id="closePanelBtn" aria-label="关闭">&times;</button>
+    </div>
+    <div class="notification-list" id="notificationList"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </span>
+    <span id="toastMessage"></span>
+  </div>
 
   <script src="app.js"></script>
 </body>

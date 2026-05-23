@@ -5,6 +5,7 @@ const DATA_DIR = path.join(__dirname, '../../data');
 const KEYWORDS_FILE = path.join(DATA_DIR, 'keywords.json');
 const HOTSPOTS_FILE = path.join(DATA_DIR, 'hotspots.json');
 const NOTIFICATIONS_FILE = path.join(DATA_DIR, 'notifications.json');
+const WHITELIST_FILE = path.join(DATA_DIR, 'whitelist.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -141,6 +142,27 @@ function markNotificationAsRead(id) {
   return null;
 }
 
+// 白名单管理
+function getWhitelist() {
+  return readJSON(WHITELIST_FILE, []);
+}
+
+function addWhitelistAccount(account) {
+  const whitelist = getWhitelist();
+  if (!whitelist.includes(account)) {
+    whitelist.push(account);
+    writeJSON(WHITELIST_FILE, whitelist);
+  }
+  return whitelist;
+}
+
+function removeWhitelistAccount(account) {
+  const whitelist = getWhitelist();
+  const filtered = whitelist.filter(a => a !== account);
+  writeJSON(WHITELIST_FILE, filtered);
+  return filtered;
+}
+
 module.exports = {
   getAllKeywords,
   addKeyword,
@@ -153,5 +175,8 @@ module.exports = {
   clearAllHotspots,
   addNotification,
   getAllNotifications,
-  markNotificationAsRead
+  markNotificationAsRead,
+  getWhitelist,
+  addWhitelistAccount,
+  removeWhitelistAccount
 };

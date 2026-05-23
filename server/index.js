@@ -16,8 +16,11 @@ app.use(express.json({ charset: 'utf-8' }));
 app.use(express.urlencoded({ extended: true, charset: 'utf-8' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+// 仅为根路径和 HTML 文件设置 text/html 响应头
 app.use((req, res, next) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  if (req.path === '/' || req.path.endsWith('.html')) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  }
   next();
 });
 
