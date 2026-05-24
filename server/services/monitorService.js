@@ -8,6 +8,8 @@ const dataService = require('./dataService');
 const converterService = require('./converterService');
 const deduplicationService = require('./deduplicationService');
 const rssService = require('./rssService');
+const timeFilterService = require('./timeFilterService');
+const quotaService = require('./quotaService');
 
 async function checkAllKeywords() {
   const keywords = dataService.getAllKeywords();
@@ -116,41 +118,42 @@ async function collectAccountHotspots(accountInfo) {
       break;
   }
 
-  return allResults;
+  return timeFilterService.filterByTimeWindow(allResults);
 }
 
 async function collectHotspots(keyword) {
   const allResults = [];
 
   try {
-    const weiboResults = await weiboService.searchWeibo(keyword, 5);
-    allResults.push(...weiboResults);
+    const weiboResults = await weiboService.searchWeibo(keyword, quotaService.getSourceQuota('weibo'));
+    allResults.push(...quotaService.applySourceQuota(weiboResults, 'weibo'));
   } catch (error) {
     console.error('微博搜索失败:', error.message);
   }
 
   try {
-    const zhihuResults = await zhihuService.searchZhihu(keyword, 5);
-    allResults.push(...zhihuResults);
+    const zhihuResults = await zhihuService.searchZhihu(keyword, quotaService.getSourceQuota('zhihu'));
+    allResults.push(...quotaService.applySourceQuota(zhihuResults, 'zhihu'));
   } catch (error) {
     console.error('知乎搜索失败:', error.message);
   }
 
   try {
-    const biliResults = await bilibiliService.searchBilibili(keyword, 3);
-    allResults.push(...biliResults);
+    const biliResults = await bilibiliService.searchBilibili(keyword, quotaService.getSourceQuota('bilibili'));
+    allResults.push(...quotaService.applySourceQuota(biliResults, 'bilibili'));
   } catch (error) {
     console.error('B站搜索失败:', error.message);
   }
 
   try {
-    const twitterResults = await twitterService.searchTweets(keyword, 5);
-    allResults.push(...twitterResults);
+    const twitterResults = await twitterService.searchTweets(keyword, quotaService.getSourceQuota('twitter'));
+    allResults.push(...quotaService.applySourceQuota(twitterResults, 'twitter'));
   } catch (error) {
     console.error('Twitter搜索失败:', error.message);
   }
 
-  return allResults;
+  const timeFiltered = timeFilterService.filterByTimeWindow(allResults);
+  return quotaService.applyTotalQuota(timeFiltered);
 }
 
 async function discoverTrendingHotspots(category = 'AI编程') {
@@ -161,36 +164,36 @@ async function discoverTrendingHotspots(category = 'AI编程') {
   const results = [];
 
   try {
-    const weiboTrends = await weiboService.getWeiboTrending(5);
-    results.push(...weiboTrends);
+    const weiboTrends = await weiboService.getWeiboTrending(quotaService.getSourceQuota('weibo'));
+    results.push(...quotaService.applySourceQuota(weiboTrends, 'weibo'));
   } catch (error) {
     console.error('获取微博热搜失败:', error.message);
   }
 
   try {
-    const zhihuHot = await zhihuService.getZhihuHot(5);
-    results.push(...zhihuHot);
+    const zhihuHot = await zhihuService.getZhihuHot(quotaService.getSourceQuota('zhihu'));
+    results.push(...quotaService.applySourceQuota(zhihuHot, 'zhihu'));
   } catch (error) {
     console.error('获取知乎热榜失败:', error.message);
   }
 
   try {
-    const biliHot = await bilibiliService.getBilibiliHot(5);
-    results.push(...biliHot);
+    const biliHot = await bilibiliService.getBilibiliHot(quotaService.getSourceQuota('bilibili'));
+    results.push(...quotaService.applySourceQuota(biliHot, 'bilibili'));
   } catch (error) {
     console.error('获取B站热门失败:', error.message);
   }
 
   try {
-    const rsshubTrends = await rssService.getTrendingFromRSSHUB(5);
-    results.push(...rsshubTrends);
+    const rsshubTrends = await rssService.getTrendingFromRSSHUB(quotaService.getSourceQuota('rsshub'));
+    results.push(...quotaService.applySourceQuota(rsshubTrends, 'rsshub'));
   } catch (error) {
     console.error('获取 RSSHub 热榜失败:', error.message);
   }
 
   try {
     const twitterTrends = await twitterService.getTrendingTopics();
-    results.push(...twitterTrends.map(t => ({
+    const mappedTrends = twitterTrends.map(t => ({
       title: t.name,
       content: t.name,
       source: 'Twitter/X',
@@ -200,12 +203,14 @@ async function discoverTrendingHotspots(category = 'AI编程') {
       url: `https://twitter.com/search?q=${encodeURIComponent(t.name)}`,
       metrics: { views: t.tweet_volume || 0 },
       reliabilityScore: t.reliabilityScore || 70
-    })));
+    }));
+    results.push(...quotaService.applySourceQuota(mappedTrends, 'twitter'));
   } catch (error) {
     console.error('获取Twitter热门失败:', error.message);
   }
 
-  const deduplicated = deduplicationService.deduplicateAndMerge(results, allHotspots);
+  const timeFiltered = timeFilterService.filterByTimeWindow(results);
+  const deduplicated = deduplicationService.deduplicateAndMerge(timeFiltered, allHotspots);
 
   for (const result of deduplicated) {
     const convertedResult = converterService.convertHotspotToSimplified(result);

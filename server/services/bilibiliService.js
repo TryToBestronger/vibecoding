@@ -1,4 +1,5 @@
 const axios = require('axios');
+const bilibiliWbiService = require('./bilibiliWbiService');
 
 const USER_AGENTS = [
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -34,28 +35,62 @@ function stripHtml(html) {
   return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
 }
 
+function getBilibiliHeaders(referer = 'https://www.bilibili.com') {
+  const headers = {
+    'User-Agent': getRandomUA(),
+    'Referer': referer,
+    'Accept': 'application/json, text/plain, */*',
+    'Origin': 'https://www.bilibili.com'
+  };
+  const cookie = process.env.BILIBILI_COOKIE;
+  if (cookie) {
+    headers.Cookie = cookie;
+  }
+  return headers;
+}
+
 async function searchBilibili(keyword, maxResults = 5) {
+  const searchUrl = 'https://api.bilibili.com/x/web-interface/search/type';
+  const referer = 'https://www.bilibili.com/search?keyword=' + encodeURIComponent(keyword);
+
   try {
-    const searchUrl = 'https://api.bilibili.com/x/web-interface/search/type';
-    const response = await fetchWithRetry(searchUrl, {
-      params: {
+    console.log(`B站搜索关键词: ${keyword}`);
+    let response;
+
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      const { imgKey, subKey } = await bilibiliWbiService.getWbiKeys(attempt > 0);
+      const signedParams = bilibiliWbiService.signParams({
         search_type: 'video',
-        keyword: keyword,
+        keyword,
         page: 1,
-        page_size: maxResults * 2,
-        order: 'totalrank'
-      },
-      headers: {
-        'User-Agent': getRandomUA(),
-        'Referer': 'https://www.bilibili.com/search?keyword=' + encodeURIComponent(keyword),
-        'Accept': 'application/json, text/plain, */*',
-        'Origin': 'https://www.bilibili.com'
-      },
-      timeout: 30000
-    });
+        page_size: Math.max(maxResults * 4, 12),
+        order: 'pubdate'
+      }, imgKey, subKey);
+
+      response = await axios.get(searchUrl, {
+        params: signedParams,
+        headers: getBilibiliHeaders(referer),
+        timeout: 30000,
+        validateStatus: () => true
+      });
+
+      const isBanned = response.status === 412 || response.data?.code === -412;
+      if (isBanned) {
+        if (attempt === 2) {
+          console.error('B站搜索失败: 触发风控 (412)，可配置 BILIBILI_COOKIE 后重试');
+          return [];
+        }
+        bilibiliWbiService.clearCache();
+        console.log(`B站搜索触发风控，正在重试 (${attempt + 1}/2)`);
+        await new Promise(resolve => setTimeout(resolve, 3000 * (attempt + 1)));
+        continue;
+      }
+
+      break;
+    }
 
     if (!response.data || response.data.code !== 0) {
-      console.log('B站搜索返回数据异常:', response.data?.message);
+      console.log('B站搜索返回数据异常:', response.data?.message || response.data?.code);
       return [];
     }
 
@@ -63,7 +98,7 @@ async function searchBilibili(keyword, maxResults = 5) {
     if (!Array.isArray(results)) return [];
 
     return results
-      .filter(video => video.play >= BILIBILI_MIN_VIEWS && video.favorites >= BILIBILI_MIN_FAVORITES)
+      .filter(video => video.play >= BILIBILI_MIN_VIEWS || video.favorites >= BILIBILI_MIN_FAVORITES)
       .slice(0, maxResults)
       .map(video => ({
         title: stripHtml(video.title),
@@ -100,10 +135,7 @@ async function getBilibiliHot(maxResults = 10) {
         ps: maxResults,
         pn: 1
       },
-      headers: {
-        'User-Agent': getRandomUA(),
-        'Referer': 'https://www.bilibili.com'
-      },
+      headers: getBilibiliHeaders('https://www.bilibili.com'),
       timeout: 30000
     });
 
@@ -153,10 +185,7 @@ async function getUserVideos(uid, maxResults = 5) {
         pn: 1,
         order: 'pubdate'
       },
-      headers: {
-        'User-Agent': getRandomUA(),
-        'Referer': 'https://www.bilibili.com'
-      },
+      headers: getBilibiliHeaders('https://www.bilibili.com'),
       timeout: 30000
     });
 
